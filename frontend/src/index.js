@@ -5,8 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import './index.css';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:5000';
-
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <AuthProvider>
