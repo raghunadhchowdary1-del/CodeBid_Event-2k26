@@ -8,7 +8,16 @@ const socketManager = require('./sockets/socketManager');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// IMPORTANT: Get frontend URL from environment variable (set on Render)
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Configure CORS for Express routes
+app.use(cors({
+  origin: [FRONTEND_URL, 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Connect to MongoDB
@@ -24,9 +33,16 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/team', require('./routes/team'));
 app.use('/api/admin', require('./routes/admin'));
 
-// Create HTTP server and attach Socket.io
+// Create HTTP server
 const server = http.createServer(app);
-const io = socketManager.init(server);
+
+// Initialize Socket.io with the same frontend URL
+const io = socketManager.init(server, {
+  cors: {
+    origin: [FRONTEND_URL, 'http://localhost:3000'],
+    credentials: true
+  }
+});
 
 // Socket.io rooms
 io.on('connection', (socket) => {

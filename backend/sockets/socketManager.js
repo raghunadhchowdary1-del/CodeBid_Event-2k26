@@ -1,10 +1,21 @@
 let io;
 
 module.exports = {
-  init: (httpServer) => {
-    io = require('socket.io')(httpServer, {
-      cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] }
-    });
+  init: (httpServer, options = {}) => {
+    const defaultOptions = {
+      cors: {
+        origin: [
+          process.env.FRONTEND_URL || 'http://localhost:3000',
+          'http://localhost:3000'
+        ],
+        credentials: true
+      }
+    };
+    const mergedOptions = { ...defaultOptions, ...options };
+    if (options.cors) {
+      mergedOptions.cors = { ...defaultOptions.cors, ...options.cors };
+    }
+    io = require('socket.io')(httpServer, mergedOptions);
     return io;
   },
   getIO: () => {
